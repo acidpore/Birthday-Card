@@ -1,0 +1,282 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(45deg, #ff69b4, #87ceeb);
+    font-family: 'Arial', sans-serif;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Background Animation */
+.bg-hearts {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.bg-heart {
+    position: absolute;
+    font-size: 1.5rem;
+    opacity: 0.2;
+    animation: bgFloat linear infinite;
+}
+
+@keyframes bgFloat {
+    0% {
+        transform: translate(0, 100vh) rotate(0deg);
+    }
+    100% {
+        transform: translate(var(--translate-x), -100%) rotate(360deg);
+    }
+}
+
+/* Existing styles */
+.container {
+    perspective: 1000px;
+    max-width: 100%;
+}
+
+.envelope {
+    position: relative;
+    width: 340px;
+    height: 480px;
+    background: #f8f8f8;
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+    transform-style: preserve-3d;
+    transition: transform 1s;
+    cursor: pointer;
+    animation: float 3s ease-in-out infinite;
+    overflow: hidden;
+}
+
+.envelope::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 340 480' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='20' y='20' width='300' height='440' fill='%23ffffff' rx='10' ry='10' stroke='%23ff69b4' stroke-width='2'/%3E%3Cline x1='40' y1='80' x2='300' y2='80' stroke='%23ff69b4' stroke-width='1' stroke-dasharray='4'/%3E%3Cline x1='40' y1='120' x2='300' y2='120' stroke='%23ff69b4' stroke-width='1' opacity='0.5'/%3E%3Cline x1='40' y1='160' x2='300' y2='160' stroke='%23ff69b4' stroke-width='1' opacity='0.5'/%3E%3Cline x1='40' y1='200' x2='300' y2='200' stroke='%23ff69b4' stroke-width='1' opacity='0.5'/%3E%3Cline x1='40' y1='240' x2='300' y2='240' stroke='%23ff69b4' stroke-width='1' opacity='0.5'/%3E%3Cline x1='40' y1='280' x2='300' y2='280' stroke='%23ff69b4' stroke-width='1' opacity='0.5'/%3E%3Cpath d='M45 45 C45 42 48 40 50 42 C52 40 55 42 55 45 L50 50 Z' fill='%23ff69b4' opacity='0.8'/%3E%3Cpath d='M285 45 C285 42 288 40 290 42 C292 40 295 42 295 45 L290 50 Z' fill='%23ff69b4' opacity='0.8'/%3E%3Cpath d='M45 435 C45 432 48 430 50 432 C52 430 55 432 55 435 L50 440 Z' fill='%23ff69b4' opacity='0.8'/%3E%3Cpath d='M285 435 C285 432 288 430 290 432 C292 430 295 432 295 435 L290 440 Z' fill='%23ff69b4' opacity='0.8'/%3E%3Ccircle cx='170' cy='360' r='40' fill='none' stroke='%23ff69b4' stroke-width='1' stroke-dasharray='4'/%3E%3Cpath d='M155 360 C155 355 165 350 170 355 C175 350 185 355 185 360 L170 370 Z' fill='%23ff69b4' opacity='0.6'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.9;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.envelope.open::before {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Tambahkan efek hover */
+.envelope:hover::before {
+    opacity: 1;
+}
+
+.letter-container {
+    height: 100%;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.letter-container::-webkit-scrollbar {
+    display: none;
+}
+
+.letter {
+    padding: 2rem;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s;
+    background: url('data:image/png;base64,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');
+    background-color: #fff;
+}
+
+.envelope.open .letter {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.letter-content {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.name {
+    color: #ff69b4;
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.photo-container {
+    margin: 1rem auto;
+    position: relative;
+    width: 180px;
+    height: 180px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+
+.photo-input {
+    display: none;
+}
+
+.photo-label {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 5px 10px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.photo-container:hover .photo-label {
+    opacity: 1;
+}
+
+.message {
+    margin: 1.5rem 0;
+    padding: 0 1rem;
+}
+
+.birthday {
+    color: #4a4a4a;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+}
+
+.wishes, .additional-wishes {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.hearts {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.hearts span {
+    animation: pulse 1.5s ease-in-out infinite;
+    font-size: 1.2rem;
+}
+
+.hearts span:nth-child(2) {
+    animation-delay: 0.5s;
+}
+
+.hearts span:nth-child(3) {
+    animation-delay: 1s;
+}
+
+.floating-hearts {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.floating-heart {
+    position: absolute;
+    font-size: 20px;
+    animation: floatUp 4s linear forwards;
+    opacity: 0;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(100%) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.envelope:hover {
+    transform: rotateY(5deg);
+}
+
+.envelope.open {
+    transform: rotateX(0deg);
+}
+
+@media (max-width: 480px) {
+    .envelope {
+        width: 300px;
+        height: 450px;
+    }
+    
+    .name {
+        font-size: 1.4rem;
+    }
+    
+    .photo-container {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .birthday {
+        font-size: 1.2rem;
+    }
+    
+    .wishes, .additional-wishes {
+        font-size: 0.9rem;
+    }
+}
